@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <title>现在几点了？</title>
+</head>
+
+<body>
+    <div>
+        <h2 class="text-2xl font-semibold text-center">北京时间</h2>
+        <div id="ntp-time" class="text-3xl font-mono text-center">
+            --:--:--
+        </div>
+        <div id="ntp-date" class="text-3xl font-mono text-center">
+            ----年--月--日
+        </div>
+    </div>
+
+    <script>
+        class TimeDisplay {
+            constructor() {
+                this.updateInterval = null;
+            }
+
+            formatTime(date) {
+                return date.toTimeString().slice(0, 8);
+            }
+
+            formatDate(date) {
+                return `${date.getFullYear()}年${(date.getMonth()+1).toString().padStart(2, '0')}月${date.getDate().toString().padStart(2, '0')}日`;
+            }
+
+            async updateDisplay() {
+                try {
+                    const date = new Date();
+                    document.getElementById('ntp-time').textContent = this.formatTime(date);
+                    document.getElementById('ntp-date').textContent = this.formatDate(date);
+                } catch (error) {
+                    console.error('NTP Time Sync Error:', error.message);
+                }
+            }
+
+            start() {
+                this.updateDisplay();
+                this.updateInterval = setInterval(() => this.updateDisplay(), 1000);
+            }
+
+            stop() {
+                if (this.updateInterval) {
+                    clearInterval(this.updateInterval);
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const timeDisplay = new TimeDisplay();
+            timeDisplay.start();
+
+            window.addEventListener('beforeunload', () => {
+                timeDisplay.stop();
+            });
+        });
+    </script>
+</body>
+</html>
